@@ -1,15 +1,22 @@
 FROM      ubuntu
 MAINTAINER Olexander Kutsenko <olexander.kutsenko@gmail.com>
 
+#Create docker user
+RUN mkdir -p /home/docker
+RUN useradd -d /home/docker -s /bin/bash -M -N -G www-data,sudo docker
+RUN chown -R docker:www-data /home/docker
+RUN echo docker:docker | chpasswd
+RUN usermod -G www-data,users www-data
+
 #install PHP
-RUN apt-get update -y
+RUN apt-get update
 RUN apt-get install -y software-properties-common python-software-properties
 RUN apt-get install -y git git-core vim nano mc nginx screen curl unzip
 RUN apt-get install -y wget php5 php5-fpm php5-cli php5-common php5-intl 
 RUN apt-get install -y php5-json php5-mysql php5-gd php5-imagick
 RUN apt-get install -y php5-curl php5-mcrypt php5-dev php5-xdebug
-RUN sudo rm /etc/php5/fpm/php.ini
-COPY configs/php.ini /etc/php5/fpm/php.ini
+COPY configs/php5-fpm/php.ini /etc/php5/fpm/php.ini
+COPY configs/php5-fpm/www.conf /etc/php5/fpm/pool.d/www.conf
 COPY configs/nginx/default /etc/nginx/sites-available/default
 
 #MySQL install + password
@@ -33,8 +40,18 @@ COPY configs/autostart.sh /root/autostart.sh
 RUN chmod +x /root/autostart.sh
 COPY configs/bash.bashrc /etc/bash.bashrc
 
+#Install Java 8
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+RUN add-apt-repository -y ppa:webupd8team/java
+RUN apt-get update
+# Accept license non-iteractive
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+RUN apt-get install -y oracle-java8-installer
+RUN apt-get install -y oracle-java8-set-default
+RUN echo "JAVA_HOME=/usr/lib/jvm/java-8-oracle" | sudo tee -a /etc/environment
+RUN export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
 #ant install
-RUN sudo apt-get install -y default-jre default-jdk
 RUN sudo apt-get install -y ant
 
 #Composer
@@ -50,20 +67,16 @@ RUN cd /usr/bin && ln -s ~/.composer/vendor/bin/phpcpd
 RUN cd /usr/bin && ln -s ~/.composer/vendor/bin/phpmd
 RUN cd /usr/bin && ln -s ~/.composer/vendor/bin/phpcs
 
-#aliases
-RUN alias ll='ls -la'
-
-#Add colorful command line
-RUN echo "force_color_prompt=yes" >> .bashrc
-RUN echo "export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;36m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'" >> .bashrc
-
 #Autocomplete symfony2
-COPY configs/files/symfony2-autocomplete.bash /root/
+COPY configs/files/symfony2-autocomplete.bash /etc/bash_completion.d/symfony2-autocomplete.bash
+COPY configs/.bashrc /root/.bashrc
+COPY configs/.bashrc /home/docker/.bashrc
 
 #etcKeeper
-COPY configs/etckeeper.sh /root
-COPY configs/files/etckeeper-hook.sh /root
-
+RUN mkdir -p /root/etckeeper
+COPY configs/etckeeper.sh /root/etckeeper.sh
+COPY configs/files/etckeeper-hook.sh /root/etckeeper/etckeeper-hook.sh
+RUN /root/etckeeper.sh
 
 #open ports
-EXPOSE 80 22
+EXPOSE 80 22 9000

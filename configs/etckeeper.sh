@@ -24,9 +24,6 @@ HIGHLEVEL_PACKAGE_MANAGER=apt
 LOWLEVEL_PACKAGE_MANAGER=dpkg
 " > /etc/etckeeper/etckeeper.conf
 
-mkdir -p /root/etckeeper
-mv  etckeeper-hook.sh /root/etckeeper/etckeeper-autocommit-on-exit.sh
-
 echo "
 if [ -d /root/etckeeper ] ; then
         for s in /root/etckeeper/*.sh ; do
@@ -35,6 +32,10 @@ if [ -d /root/etckeeper ] ; then
 fi
 " >> ~/.bashrc
 
-cd /etc etckeeper init
+git config --global user.email "you@example.com"
+git config --global user.name "Symfony2 user"
+
+cd /etc
+etckeeper init
 git add .
 etckeeper commit 'initial commit'
