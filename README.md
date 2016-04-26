@@ -1,6 +1,6 @@
 #Create container
 ```
-docker run -i -t -d --name=symfony2 -h=symfony2 -p 1080:80 -p 1022:22 -p 9001:9000 cristo/symfony2 /bin/bash
+docker run -i -t -d --name=symfony2 -h=symfony2 -p 1080:80 -p 1022:22 -p 9001:9000 grossumua/symfony2 /bin/bash
 ```
 
 #MySQL
@@ -77,5 +77,5 @@ Go to: Languages & Frameworks > PHP > Debug > DBGp Proxy and set the following s
     Port: 9001
 ```
 #Origin
-[Docker Hub] (https://registry.hub.docker.com/u/cristo/symfony2/)
-[Git Hub] (https://github.com/monte-fm/symfony2)
+[Docker Hub] (https://hub.docker.com/r/grossumua/symfony2/)
+[Git Hub] (https://github.com/GrossumUA/Docker-symfony2)
