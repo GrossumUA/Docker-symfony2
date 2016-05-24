@@ -3,6 +3,12 @@
 docker run -i -t -d --name=symfony2 -h=symfony2 -p 1080:80 -p 1022:22 -p 9001:9000 grossumua/symfony2 /bin/bash
 ```
 
+#For developers with mount volume:
+
+```
+docker run -i -t -d --name=symfony2 -h=symfony2 -p 1080:80 -p 1022:22 -p 9001:9000 -p 3316:3306 -v <local path>:<container path (/var/www/)> grossumua/symfony2 /bin/bash
+```
+
 #MySQL
 ```
 user: root 
